@@ -4,7 +4,16 @@
 set -Eeuo pipefail
 IFS=$'\n\t'
 
-readonly MYTHIC_DIR="${MYTHIC_DIR:-/opt/Mythic}"
+if [[ -n ${MYTHIC_DIR:-} ]]; then
+    readonly MYTHIC_DIR
+elif [[ -x /opt/mythic/mythic-cli ]]; then
+    readonly MYTHIC_DIR=/opt/mythic
+elif [[ -x /opt/Mythic/mythic-cli ]]; then
+    # Compatibility with installations created by older versions of these scripts.
+    readonly MYTHIC_DIR=/opt/Mythic
+else
+    readonly MYTHIC_DIR=/opt/mythic
+fi
 
 log() { printf '[INFO] %s\n' "$*"; }
 die() { printf '[ERROR] %s\n' "$*" >&2; exit 1; }
@@ -66,7 +75,8 @@ Examples:
   sudo ./mythic-components.sh --all
 
 Environment:
-  MYTHIC_DIR  Mythic installation directory (default: /opt/Mythic)
+  MYTHIC_DIR  Mythic installation directory (default: /opt/mythic; an existing
+              legacy /opt/Mythic installation is detected automatically)
 EOF
 }
 
@@ -91,14 +101,36 @@ for component_name in "${requested_components[@]}"; do
 done
 
 cd "$MYTHIC_DIR"
+declare -a installed_components=()
+declare -a failed_components=()
 for component_name in "${requested_components[@]}"; do
     log "Installing ${component_name}."
-    ./mythic-cli install github "${COMPONENT_URLS[$component_name]}"
+    if ./mythic-cli install github "${COMPONENT_URLS[$component_name]}"; then
+        installed_components+=("$component_name")
+    else
+        failed_components+=("$component_name")
+        printf '[WARN] Failed to install %s; continuing with the remaining components.\n' \
+            "$component_name" >&2
+    fi
 done
 
 log "Starting/reloading Mythic services."
-./mythic-cli start
+start_failed=false
+if ! ./mythic-cli start; then
+    start_failed=true
+    printf '[WARN] Mythic failed to start/reload.\n' >&2
+fi
 
-printf -v installed_list '%s, ' "${requested_components[@]}"
-log "Installed requested components: ${installed_list%, }"
+if (( ${#installed_components[@]} > 0 )); then
+    printf -v installed_list '%s, ' "${installed_components[@]}"
+    log "Installed successfully: ${installed_list%, }"
+fi
+if (( ${#failed_components[@]} > 0 )); then
+    printf -v failed_list '%s, ' "${failed_components[@]}"
+    printf '[ERROR] Failed components: %s\n' "${failed_list%, }" >&2
+fi
 ./mythic-cli status || true
+
+if (( ${#failed_components[@]} > 0 )) || [[ "$start_failed" == true ]]; then
+    exit 1
+fi

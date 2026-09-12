@@ -6,7 +6,16 @@ set -Eeuo pipefail
 IFS=$'\n\t'
 
 readonly MYTHIC_REPO="${MYTHIC_REPO:-https://github.com/its-a-feature/Mythic.git}"
-readonly MYTHIC_DIR="${MYTHIC_DIR:-/opt/Mythic}"
+if [[ -n ${MYTHIC_DIR:-} ]]; then
+    readonly MYTHIC_DIR
+elif [[ -d /opt/mythic/.git ]]; then
+    readonly MYTHIC_DIR=/opt/mythic
+elif [[ -d /opt/Mythic/.git ]]; then
+    # Compatibility with installations created by older versions of these scripts.
+    readonly MYTHIC_DIR=/opt/Mythic
+else
+    readonly MYTHIC_DIR=/opt/mythic
+fi
 readonly MYTHIC_REF="${MYTHIC_REF:-}"
 readonly MIN_DOCKER_VERSION="20.10.22"
 
@@ -33,7 +42,8 @@ Options:
   -h, --help
 
 Environment overrides:
-  MYTHIC_DIR   Installation directory (default: /opt/Mythic)
+  MYTHIC_DIR   Installation directory (default: /opt/mythic; an existing legacy
+               /opt/Mythic installation is detected automatically)
   MYTHIC_REPO  Git repository URL
   MYTHIC_REF   Branch or tag to clone (default: repository default branch)
 EOF

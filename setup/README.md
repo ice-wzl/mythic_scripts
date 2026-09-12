@@ -70,6 +70,11 @@ sudo ./mythic-components.sh --all
 
 The all-components installation is intentionally separate from the vanilla
 Mythic installer and can consume significant download time, disk space, and
-memory because each component runs in its own container.
+memory because each component runs in its own container. If a third-party
+component fails to install, the script continues through the rest of the
+catalog, reloads Mythic, prints a failure summary, and exits with a nonzero
+status.
 
-All Mythic scripts accept `MYTHIC_DIR` to override the default `/opt/Mythic` path.
+All Mythic scripts accept `MYTHIC_DIR` to override the default `/opt/mythic`
+path. Existing installations at the legacy `/opt/Mythic` path are detected
+automatically.
