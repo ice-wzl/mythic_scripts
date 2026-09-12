@@ -1,0 +1,24 @@
+name: Merlin New Callback Sleep 4h
+description: Set new Merlin callbacks to a 4 hour sleep
+trigger: callback_new
+trigger_data:
+    payload_types:
+        - merlin
+environment: {}
+keywords:
+    - merlin_callback
+run_as: bot
+steps:
+    - name: set sleep to 4 hours
+      description: ""
+      depends_on: []
+      action: task_create
+      action_data:
+        callback_display_id: CALLBACK_ID
+        command_name: sleep
+        params: 14400s
+      environment: {}
+      inputs:
+        CALLBACK_ID: env.display_id
+      outputs: {}
+      continue_on_error: false

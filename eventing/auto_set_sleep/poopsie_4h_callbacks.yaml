@@ -1,0 +1,26 @@
+name: Poopsie New Callback Sleep 4h
+description: Set new Poopsie callbacks to a 4 hour sleep
+trigger: callback_new
+trigger_data:
+    payload_types:
+        - poopsie
+environment: {}
+keywords:
+    - poopsie_callback
+run_as: bot
+steps:
+    - name: set sleep to 4 hours
+      description: ""
+      depends_on: []
+      action: task_create
+      action_data:
+        callback_display_id: CALLBACK_ID
+        command_name: sleep
+        params_dictionary:
+            interval: 14400
+            jitter: 20
+      environment: {}
+      inputs:
+        CALLBACK_ID: env.display_id
+      outputs: {}
+      continue_on_error: false
