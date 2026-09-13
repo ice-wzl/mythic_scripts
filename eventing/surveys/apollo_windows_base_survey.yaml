@@ -87,6 +87,11 @@ steps:
     action_data:
       callback_display_id: CALLBACK_ID
       command_name: netstat
+      params_dictionary:
+        tcp: false
+        udp: false
+        established: false
+        listen: false
 
   - name: "environment variables"
     description: "Collect process environment variables"
