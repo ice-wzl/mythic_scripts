@@ -1,5 +1,5 @@
-name: "Poseidon Linux Non-Root Survey"
-description: "Manual non-root Linux survey using Poseidon native commands"
+name: "Poseidon Linux Non-Root Base Survey"
+description: "Base non-root Linux survey using Poseidon native commands"
 trigger: manual
 run_as: self
 

@@ -1,0 +1,295 @@
+name: "Apollo Windows Base Non-Administrator Survey"
+description: "Base Non-Administrator Windows survey using Apollo native commands"
+trigger: manual
+run_as: self
+
+steps:
+  - name: "working directory"
+    description: "Print the current working directory"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: pwd
+
+  - name: "current identity"
+    description: "Report the current access token identity"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: whoami
+
+  - name: "token privileges"
+    description: "Enable and report privileges available to the current access token"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: getprivs
+
+  - name: "network interfaces"
+    description: "Collect network adapter and interface information"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ifconfig
+
+  - name: "processes"
+    description: "List running processes"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ps
+
+  - name: "process details"
+    description: "Collect process names, IDs, and accessible executable paths"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: "Get-Process | Select-Object Name,Id,Path | Format-List"
+
+  - name: "network connections"
+    description: "List TCP and UDP connections"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: netstat
+
+  - name: "environment variables"
+    description: "Collect process environment variables"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: "Get-ChildItem Env:"
+
+  - name: "powershell version"
+    description: "Report the PowerShell version"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: "$PSVersionTable.PSVersion"
+
+  - name: "local users"
+    description: "Enumerate local user accounts"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: shell
+      params: "net user"
+
+  - name: "local groups"
+    description: "Enumerate local groups"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: net_localgroup
+
+  - name: "computer information"
+    description: "Collect consolidated operating system and computer information"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: "Get-ComputerInfo"
+
+  - name: "network routes"
+    description: "Collect and sort the network routing table"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: "Get-NetRoute | Sort-Object InterfaceIndex,DestinationPrefix | Format-Table -AutoSize"
+
+  - name: "arp table"
+    description: "Collect the ARP table"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: shell
+      params: "arp -a"
+
+  - name: "local shares"
+    description: "Enumerate shares on localhost"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: net_shares
+      params: "localhost"
+
+  - name: "list system drive"
+    description: "List the root of the system drive"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params: 'C:\'
+
+  - name: "list program data"
+    description: "List the ProgramData directory"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params: 'C:\ProgramData'
+
+  - name: "list user profiles"
+    description: "List the Users directory"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params: 'C:\Users'
+
+  - name: "list 64-bit program files"
+    description: "List the Program Files directory"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params: '"C:\Program Files"'
+
+  - name: "list 32-bit program files"
+    description: "List the Program Files (x86) directory"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: ls
+      params: '"C:\Program Files (x86)"'
+
+  - name: "installed 64-bit software"
+    description: "Enumerate installed software from the native uninstall registry view"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: "Get-ItemProperty 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object DisplayName | Select-Object DisplayName,DisplayVersion,Publisher,InstallLocation | Sort-Object DisplayName | Format-Table -AutoSize"
+
+  - name: "installed 32-bit software"
+    description: "Enumerate installed software from the Wow6432Node uninstall registry view"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: "Get-ItemProperty 'HKLM:\\SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*' -ErrorAction SilentlyContinue | Where-Object DisplayName | Select-Object DisplayName,DisplayVersion,Publisher,InstallLocation | Sort-Object DisplayName | Format-Table -AutoSize"
+
+  - name: "powershell session history"
+    description: "Collect command history from the current PowerShell runspace"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: "Get-History"
+
+  - name: "powershell readline history"
+    description: "Locate and read the current user's PSReadLine history when available"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: '$p=(Get-PSReadLineOption).HistorySavePath; Write-Output "History: $p"; if(Test-Path $p){Get-Content $p}'
+
+  - name: "scheduled task executables"
+    description: "List non-system executables configured in scheduled tasks"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: 'schtasks /query /fo LIST /v | Select-String ''^Task To Run:'' | ForEach-Object { ($_ -split '':'',2)[1].Trim() } | Where-Object { $_ -and $_ -notmatch ''(?i)(\\windows\\system32|%windir%\\system32|COM Handler)'' }'
+
+  - name: "services"
+    description: "Collect service names, states, accounts, and executable paths"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: "Get-CimInstance Win32_Service | Select-Object Name,DisplayName,State,StartMode,StartName,PathName | Format-List"
+
+  - name: "non-windows automatic services"
+    description: "Collect automatic services whose executable paths are outside the Windows directory"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: 'Get-CimInstance Win32_Service | Where-Object { $_.StartMode -eq ''Auto'' -and $_.PathName -and $_.PathName -notmatch ''(?i)^[`"]?C:\\Windows\\'' } | Select-Object Name,DisplayName,State,StartMode,StartName,PathName | Format-List'
