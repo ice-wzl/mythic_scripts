@@ -332,7 +332,7 @@ steps:
       params: 'schtasks /query /fo LIST /v | Select-String ''^Task To Run:'' | ForEach-Object { ($_ -split '':'',2)[1].Trim() } | Where-Object { $_ -and $_ -notmatch ''(?i)(\\windows\\system32|%windir%\\system32|COM Handler)'' }'
 
   - name: "services"
-    description: "Collect service names, states, accounts, and executable paths"
+    description: "Collect service names, accounts, startup modes, and executable paths from the registry"
     depends_on:
       - "scheduled task executables"
     inputs:
@@ -342,10 +342,23 @@ steps:
     action_data:
       callback_display_id: CALLBACK_ID
       command_name: powershell
-      params: "Get-CimInstance Win32_Service | Select-Object Name,DisplayName,State,StartMode,StartName,PathName | Format-List"
+      params: >-
+        Get-ChildItem HKLM:\SYSTEM\CurrentControlSet\Services -ErrorAction SilentlyContinue |
+        ForEach-Object {
+          $p = Get-ItemProperty $_.PSPath -ErrorAction SilentlyContinue;
+          if ($p.Type -band 0x30) {
+            [PSCustomObject]@{
+              Name        = $_.PSChildName;
+              DisplayName = $p.DisplayName;
+              StartMode   = @{0='Boot';1='System';2='Automatic';3='Manual';4='Disabled'}[[int]$p.Start];
+              StartName   = $p.ObjectName;
+              PathName    = $p.ImagePath
+            }
+          }
+        } | Format-List
 
-  - name: "non-windows automatic services"
-    description: "Collect automatic services whose executable paths are outside the Windows directory"
+  - name: "services in weird locations"
+    description: "Collect services running from odd locations on the host"
     depends_on:
       - "services"
     inputs:
@@ -355,4 +368,4 @@ steps:
     action_data:
       callback_display_id: CALLBACK_ID
       command_name: powershell
-      params: 'Get-CimInstance Win32_Service | Where-Object { $_.StartMode -eq ''Auto'' -and $_.PathName -and $_.PathName -notmatch ''(?i)^[`"]?C:\\Windows\\'' } | Select-Object Name,DisplayName,State,StartMode,StartName,PathName | Format-List'
+      params: 'Get-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Services\* -ErrorAction SilentlyContinue | Where-Object { $_.ImagePath -and $_.ImagePath -notmatch "(?i)Windows|System32|svchost" } | Select-Object PSChildName,ImagePath,ObjectName'
