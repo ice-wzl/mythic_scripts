@@ -1,0 +1,109 @@
+name: "Apollo Windows Defender Survey"
+description: "Enumerate the status of Defender via registry"
+trigger: manual
+run_as: self
+
+steps:
+  - name: "defender base"
+    description: "List defender base key"
+    depends_on: []
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: reg_query
+      params_dictionary:
+        Hive: "HKLM"
+        Key: "Software\\Microsoft\\Windows Defender"
+
+  - name: "real-time protection"
+    description: "List real-time protection status"
+    depends_on: 
+      - "defender base"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: reg_query
+      params_dictionary:
+        Hive: "HKLM"
+        Key: "Software\\Microsoft\\Windows Defender\\Real-Time Protection"
+
+  - name: "features"
+    description: "List defender features"
+    depends_on: 
+      - "real-time protection"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: reg_query
+      params_dictionary:
+        Hive: "HKLM"
+        Key: "Software\\Microsoft\\Windows Defender\\Features"
+
+  - name: "spynet"
+    description: "List spynet status"
+    depends_on: 
+      - "features"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: reg_query
+      params_dictionary:
+        Hive: "HKLM"
+        Key: "Software\\Microsoft\\Windows Defender\\SpyNet"
+
+  - name: "protected folder"
+    description: "List protected folders"
+    depends_on: 
+      - "spynet"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: reg_query
+      params_dictionary:
+        Hive: "HKLM"
+        Key: "Software\\Microsoft\\Windows Defender\\Windows Defender Exploit Guard\\Controlled Folder Access\\ProtectedFolders"
+
+  - name: "dlp rules"
+    description: "List DLP rules"
+    depends_on: 
+      - "protected folder"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: reg_query
+      params_dictionary:
+        Hive: "HKLM"
+        Key: "Software\\Microsoft\\Windows Defender\\Windows Defender Exploit Guard\\DLP\\Rules"
+
+  - name: "exclusion paths"
+    description: "List exclusion paths"
+    depends_on: 
+      - "dlp rules"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: reg_query
+      params_dictionary:
+        Hive: "HKLM"
+        Key: "Software\\Microsoft\\Windows Defender\\exclusions\\paths"
