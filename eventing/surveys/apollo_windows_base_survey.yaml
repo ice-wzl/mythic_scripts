@@ -331,10 +331,23 @@ steps:
       command_name: powershell
       params: 'schtasks /query /fo LIST /v | Select-String ''^Task To Run:'' | ForEach-Object { ($_ -split '':'',2)[1].Trim() } | Where-Object { $_ -and $_ -notmatch ''(?i)(\\windows\\system32|%windir%\\system32|COM Handler)'' }'
 
+  - name: "scheduled task logs"
+    description: "Get the last 60 schtask logs"
+    depends_on:
+      - "scheduled task executables"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: 'Get-WinEvent -LogName "Microsoft-Windows-TaskScheduler/Operational" -MaxEvents 60 | Select-Object TimeCreated, Id, Message | fl'
+
   - name: "services"
     description: "Collect service names, accounts, startup modes, and executable paths from the registry"
     depends_on:
-      - "scheduled task executables"
+      - "scheduled task logs"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
