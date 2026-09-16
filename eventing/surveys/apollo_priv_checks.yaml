@@ -71,26 +71,10 @@ steps:
         version: 4.7_Any
         execution: inline_assembly
 
-  - name: "forge_net_Seatbelt defensive_controls"
-    description: "Seatbelt defensive controls"
-    depends_on:
-      - "forge_net_Seatbelt os_info"
-    inputs:
-      CALLBACK_ID: env.display_id
-    action: task_create
-    action_data:
-      callback_display_id: CALLBACK_ID
-      command_name: forge_net_Seatbelt
-      payload_type: forge
-      params_dictionary:
-        args: "WindowsDefender AntiVirus AMSIProviders Sysmon WindowsEventForwarding WindowsFirewall AppLocker AuditPolicies AuditPolicyRegistry PowerShell McAfeeConfigs McAfeeSiteList SecurityPackages"
-        version: 4.7_Any
-        execution: inline_assembly
-
   - name: "forge_net_Seatbelt privs_tokens"
     description: "Seatbelt privileges, token, authentication"
     depends_on:
-      - "forge_net_Seatbelt defensive_controls"
+      - "forge_net_Seatbelt os_info"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
