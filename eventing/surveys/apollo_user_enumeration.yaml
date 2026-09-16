@@ -1,0 +1,35 @@
+###########################################################
+# NOTE
+# After importing this script into Mythic as an eventing workflow, hit the paper clip and upload:
+# /scripts/apollo/Invoke-UserEnum.ps1
+###########################################################
+name: "Apollo User Enumeration"
+description: "Perform automated User Enumeration"
+trigger: manual
+run_as: self
+
+steps:
+
+  - name: "import user enumeration"
+    depends_on: []
+    inputs:
+      CALLBACK_ID: env.display_id
+      SCRIPT_ID: upload.Invoke-UserEnum.ps1
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell_import
+      parameter_group_name: Default
+      params_dictionary:
+        file: SCRIPT_ID
+
+  - name: "run user enumeration"
+    depends_on:
+      - "import user enumeration"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: "Invoke-UserEnum"
