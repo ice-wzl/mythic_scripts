@@ -8,6 +8,7 @@ steps:
 
   - name: "print c2"
     description: "Print Poseidon's active C2 configuration"
+    depends_on: []
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -18,6 +19,8 @@ steps:
 
   - name: "config"
     description: "Get Poseidon configuration and host information"
+    depends_on:
+      - "print c2"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -28,6 +31,8 @@ steps:
 
   - name: "get user"
     description: "Get the current user context"
+    depends_on:
+      - "config"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -38,6 +43,8 @@ steps:
 
   - name: "timestamps"
     description: "Collect local time, UTC time, and Unix epoch"
+    depends_on:
+      - "get user"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -47,8 +54,10 @@ steps:
       command_name: shell
       params: "date; date -u; date +%s"
 
-  - name: "environment"
+  - name: "enviroment"
     description: "Collect process environment variables"
+    depends_on:
+      - "timestamps"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -59,6 +68,8 @@ steps:
 
   - name: "host identity"
     description: "Collect sessions, cwd, identity, kernel, hostname, and OS release data"
+    depends_on:
+      - "enviroment"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -72,6 +83,8 @@ steps:
 
   - name: "list home"
     description: "Recursively list /home to depth 2"
+    depends_on:
+      - "host identity"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -85,6 +98,8 @@ steps:
 
   - name: "triage home"
     description: "Triage potentially interesting files under /home"
+    depends_on:
+      - "list home"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -96,6 +111,8 @@ steps:
 
   - name: "list opt"
     description: "List /opt"
+    depends_on:
+      - "triage home"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -108,6 +125,8 @@ steps:
 
   - name: "list srv"
     description: "List /srv"
+    depends_on:
+      - "list opt"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -120,6 +139,8 @@ steps:
 
   - name: "list filesystem root"
     description: "List the filesystem root"
+    depends_on:
+      - "list srv"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -132,6 +153,8 @@ steps:
 
   - name: "list tmp"
     description: "List /tmp"
+    depends_on:
+      - "list filesystem root"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -144,6 +167,8 @@ steps:
 
   - name: "list shared memory"
     description: "List /dev/shm"
+    depends_on:
+      - "list tmp"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -156,6 +181,8 @@ steps:
 
   - name: "list var tmp"
     description: "List /var/tmp"
+    depends_on:
+      - "list shared memory"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -168,6 +195,8 @@ steps:
 
   - name: "list var log"
     description: "Recursively list /var/log to depth 2"
+    depends_on:
+      - "list var tmp"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -181,6 +210,8 @@ steps:
 
   - name: "list web root"
     description: "Recursively list /var/www to depth 2"
+    depends_on:
+      - "list var log"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -194,6 +225,8 @@ steps:
 
   - name: "list passwd"
     description: "Get metadata for /etc/passwd"
+    depends_on:
+      - "list web root"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -206,6 +239,8 @@ steps:
 
   - name: "list shadow"
     description: "Get metadata for /etc/shadow without reading it"
+    depends_on:
+      - "list passwd"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -218,6 +253,8 @@ steps:
 
   - name: "login history"
     description: "Collect available login history"
+    depends_on:
+      - "list shadow"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -229,6 +266,8 @@ steps:
 
   - name: "drives"
     description: "Enumerate mounted drives"
+    depends_on:
+      - "login history"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -239,6 +278,8 @@ steps:
 
   - name: "inode usage"
     description: "Collect filesystem inode usage"
+    depends_on:
+      - "drives"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -250,6 +291,8 @@ steps:
 
   - name: "mounts"
     description: "Collect mounted filesystem details"
+    depends_on:
+      - "inode usage"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -261,6 +304,8 @@ steps:
 
   - name: "process tree"
     description: "Collect a detailed process tree"
+    depends_on:
+      - "mounts"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -272,6 +317,8 @@ steps:
 
   - name: "interfaces"
     description: "Collect network interface information using Poseidon's native command"
+    depends_on:
+      - "process tree"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -282,6 +329,8 @@ steps:
 
   - name: "diagnostic modules"
     description: "Check loaded kernel modules for diagnostic-related entries"
+    depends_on:
+      - "interfaces"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -293,6 +342,8 @@ steps:
 
   - name: "network sockets"
     description: "Collect listening and established network sockets"
+    depends_on:
+      - "diagnostic modules"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -304,6 +355,8 @@ steps:
 
   - name: "ip addresses"
     description: "Collect IP address configuration"
+    depends_on:
+      - "network sockets"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -315,6 +368,8 @@ steps:
 
   - name: "routes"
     description: "Collect the routing table"
+    depends_on:
+      - "ip addresses"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -326,6 +381,8 @@ steps:
 
   - name: "neighbors"
     description: "Collect the neighbor or ARP table"
+    depends_on:
+      - "routes"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -337,6 +394,8 @@ steps:
 
   - name: "recent filesystem changes"
     description: "Find files changed in the last 120 minutes on the root filesystem"
+    depends_on:
+      - "neighbors"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -349,6 +408,8 @@ steps:
 
   - name: "cron locations"
     description: "List common system and user cron locations"
+    depends_on:
+      - "recent filesystem changes"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -360,6 +421,8 @@ steps:
 
   - name: "system crontab"
     description: "Read the system crontab"
+    depends_on:
+      - "cron locations"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -371,6 +434,8 @@ steps:
 
   - name: "ptrace scope"
     description: "Collect the Yama ptrace restriction setting"
+    depends_on:
+      - "system crontab"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -382,6 +447,8 @@ steps:
 
   - name: "download sshd config"
     description: "Download the OpenSSH server configuration when readable"
+    depends_on:
+      - "ptrace scope"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -393,6 +460,8 @@ steps:
 
   - name: "download passwd"
     description: "Download the local account database"
+    depends_on:
+      - "download sshd config"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
@@ -404,6 +473,8 @@ steps:
 
   - name: "download fstab"
     description: "Download the static filesystem configuration"
+    depends_on:
+      - "download passwd"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
