@@ -28,11 +28,14 @@ declare -Ar COMPONENT_URLS=(
     [poopsie]='https://github.com/MythicAgents/Poopsie.git'
     [forge]='https://github.com/MythicAgents/forge.git'
     [hydra]='https://github.com/MythicAgents/hydra.git'
+    [thanatos]='https://github.com/MythicAgents/thanatos'
+    [xenon]='https://github.com/MythicAgents/Xenon'
     [bloodhound]='https://github.com/MythicAgents/bloodhound.git'
     [dll_wrapper]='https://github.com/MythicAgents/dll_wrapper.git'
     [service_wrapper]='https://github.com/MythicAgents/service_wrapper.git'
     [http]='https://github.com/MythicC2Profiles/http.git'
     [httpx]='https://github.com/MythicC2Profiles/httpx.git'
+    [dynamichttp]='https://github.com/MythicC2Profiles/dynamichttp'
     [websocket]='https://github.com/MythicC2Profiles/websocket.git'
     [smb]='https://github.com/MythicC2Profiles/smb.git'
     [tcp]='https://github.com/MythicC2Profiles/tcp.git'
@@ -45,8 +48,8 @@ declare -Ar COMPONENT_URLS=(
 # Associative arrays have no useful presentation order, so keep the complete
 # installation order explicit and deterministic.
 declare -ar ALL_COMPONENTS=(
-    http httpx websocket smb tcp dns
-    apollo athena poseidon merlin poopsie hades medusa
+    http httpx dynamichttp websocket smb tcp dns
+    apollo athena poseidon merlin poopsie hades medusa thanatos xenon
     forge hydra bloodhound basic_logger
     registry_browser ldap_browser
     dll_wrapper service_wrapper
@@ -59,8 +62,8 @@ Usage:
   sudo ./mythic-components.sh --all
 
 Available components:
-  Agents:       apollo athena poseidon merlin poopsie hades medusa
-  Profiles:     http httpx websocket smb tcp dns
+  Agents:       apollo athena poseidon merlin poopsie hades medusa thanatos xenon
+  Profiles:     http httpx dynamichttp websocket smb tcp dns
   Extensions:   forge hydra basic_logger registry_browser ldap_browser
   Integrations: bloodhound
   Wrappers:     dll_wrapper service_wrapper
