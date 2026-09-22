@@ -104,7 +104,7 @@ steps:
     action_data:
       callback_display_id: CALLBACK_ID
       command_name: powershell
-      params: "Get-ChildItem Env:"
+      params: "Get-ChildItem Env: | fl"
 
   - name: "powershell version"
     description: "Report the PowerShell version"
