@@ -32,6 +32,6 @@ steps:
       command_name: forge_net_SauronEye
       payload_type: forge
       params_dictionary:
-        args: "d C:\\ --filetypes .txt .doc .docx .xls .config .ps1 .vbs .bat --contents --keywords password pass* -v"
+        args: "d C:\\ --filetypes .txt .doc .docx .xls .config .ps1 .vbs .bat .kdbx .xml --contents --keywords password pass* -v"
         version: 4.7_Any
         execution: inline_assembly

@@ -41,10 +41,23 @@ steps:
       callback_display_id: CALLBACK_ID
       command_name: getuser
 
+  - name: "fix path"
+    description: "Fix the path env var"
+    depends_on:
+      - "get user"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: setenv
+      params: 'PATH "/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/bin:/sbin"'
+
   - name: "timestamps"
     description: "Collect local time, UTC time, and Unix epoch"
     depends_on:
-      - "get user"
+      - "fix path"
     inputs:
       CALLBACK_ID: env.display_id
     action: task_create
