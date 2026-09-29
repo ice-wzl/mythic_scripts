@@ -1,0 +1,31 @@
+name: "Poseidon Linux Saftey Check"
+description: "Saftey check to ensure you are a daemon and fix of PATH"
+trigger: manual
+run_as: self
+
+steps:
+  - name: "fix path"
+    description: "Fix PATH so we can use shell commands if needed"
+    depends_on: []
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: setenv
+      params: 'PATH "/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/bin:/sbin"'
+
+  - name: "check daemon"
+    description: "Ensure Poseidon is running as a daemon in the process list"
+    depends_on:
+      - "fix path"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    continue_on_error: true
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: shell
+      params: "ps -elf --forest"
+      # bad opsec but the built in ps is terrible

@@ -1,0 +1,38 @@
+name: "forge_net_Snaffler"
+description: "Register and run Snaffler via forge_net"
+trigger: manual
+run_as: self
+
+steps:
+###########################################################
+# Snaffler
+###########################################################
+  - name: "register forge_net_Snaffler"
+    depends_on: []
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_register
+      payload_type: forge
+      params_dictionary:
+        collectionName: SharpCollection
+        commandName: Snaffler
+        remove: false
+
+  - name: "forge_net_Snaffler C_drive_search"
+    description: "Snaffler C drive search"
+    depends_on:
+      - "register forge_net_Snaffler"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: forge_net_Snaffler
+      payload_type: forge
+      params_dictionary:
+        args: '-s -i C:\'
+        version: 4.7_Any
+        execution: inline_assembly

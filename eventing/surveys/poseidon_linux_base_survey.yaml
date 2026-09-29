@@ -377,7 +377,7 @@ steps:
     action_data:
       callback_display_id: CALLBACK_ID
       command_name: shell
-      params: "ip -c a || ifconfig -a"
+      params: "ip a || ifconfig -a"
 
   - name: "routes"
     description: "Collect the routing table"
