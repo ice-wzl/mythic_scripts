@@ -1,0 +1,35 @@
+###########################################################
+# NOTE
+# After importing this script into Mythic as an eventing workflow, hit the paper clip and upload:
+# /scripts/apollo/PrivescCheck.ps1
+###########################################################
+name: "Apollo Powershell Privesc Check"
+description: "Perform automated Privilege Escalation Checks"
+trigger: manual
+run_as: self
+
+steps:
+
+  - name: "import privesc check"
+    depends_on: []
+    inputs:
+      CALLBACK_ID: env.display_id
+      SCRIPT_ID: upload.PrivescCheck.ps1
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell_import
+      parameter_group_name: Default
+      params_dictionary:
+        file: SCRIPT_ID
+
+  - name: "run privesc check"
+    depends_on:
+      - "import privesc check"
+    inputs:
+      CALLBACK_ID: env.display_id
+    action: task_create
+    action_data:
+      callback_display_id: CALLBACK_ID
+      command_name: powershell
+      params: "Invoke-PrivescCheck -Extended -Audit"
